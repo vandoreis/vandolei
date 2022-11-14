@@ -22,6 +22,7 @@ def gera_times(tamanho_time, num_times, jogadores_cadastrados):
     lista_jogadores = jogadores_cadastrados.copy()
     for i in range(num_times):
         time = []
+        tentativa = 0
         while True:
             jog = sorteia_jogador(lista_jogadores)
 
@@ -42,6 +43,11 @@ def gera_times(tamanho_time, num_times, jogadores_cadastrados):
             if len(time) == tamanho_time:
                 times.append(time)
                 break
+
+            tentativa += 1
+            if tentativa == 10:
+                return []
+
     return times
 
 
@@ -59,10 +65,12 @@ def calcula_score_time(time, ideal):
 
 
 def calcula_score_solucao(times, ideal):
-    score = 0
-    for time in times:
-        score += calcula_score_time(time, ideal)
-    return score
+    if times:
+        score = 0
+        for time in times:
+            score += calcula_score_time(time, ideal)
+        return score
+    return 100000000
 
 
 def printa_times(times, ideal):
@@ -90,7 +98,7 @@ def sorteia_times(tamanho_time, num_times, jogadores_cadastrados):
     ideal = calcula_nota_de_corte(jogadores_cadastrados)
     score = melhor_score = 100000
     i = 0
-    while i < 1000 and score != 0:
+    while i < 10000 and score != 0:
         times_sorteados = gera_times(tamanho_time, num_times, jogadores_cadastrados)
         score = calcula_score_solucao(times_sorteados, ideal)
         if score < melhor_score:
@@ -103,8 +111,8 @@ def sorteia_times(tamanho_time, num_times, jogadores_cadastrados):
 
 if __name__ == '__main__':
     # PARÂMETROS CUSTOMIZAVEIS
-    TAMANHO_TIME = 4
-    NUM_TIMES = 3
+    TAMANHO_TIME = 3
+    NUM_TIMES = 4
     jogadores = [
         jogador.vando,
         jogador.thigas,
