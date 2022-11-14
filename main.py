@@ -2,11 +2,11 @@ import random
 import jogador
 
 
-def calcula_nota_de_corte(jogadores):
+def calcula_nota_de_corte(lista_jog):
     soma = 0
-    for jogador in jogadores:
-        soma += jogador.tier
-        for convidado in jogador.convidados:
+    for jog in lista_jog:
+        soma += jog.tier
+        for convidado in jog.convidados:
             soma += convidado.tier
     soma /= NUM_TIMES
     return soma
@@ -17,29 +17,29 @@ def sorteia_jogador(nomes):
     return nomes[pos]
 
 
-def gera_times(TAMANHO_TIME, NUM_TIMES, jogadores):
+def gera_times(tamanho_time, num_times, jogadores_cadastrados):
     times = []
-    lista_jogadores = jogadores.copy()
-    for i in range(NUM_TIMES):
+    lista_jogadores = jogadores_cadastrados.copy()
+    for i in range(num_times):
         time = []
         while True:
-            jogador = sorteia_jogador(lista_jogadores)
+            jog = sorteia_jogador(lista_jogadores)
 
-            if not jogador.convidados:
-                time.append(jogador)
-                lista_jogadores.remove(jogador)
+            if not jog.convidados:
+                time.append(jog)
+                lista_jogadores.remove(jog)
 
             else:
                 possivel_time = time.copy()
-                possivel_time.append(jogador)
-                for convidado in jogador.convidados:
+                possivel_time.append(jog)
+                for convidado in jog.convidados:
                     possivel_time.append(convidado)
 
-                if len(possivel_time) <= TAMANHO_TIME:
+                if len(possivel_time) <= tamanho_time:
                     time = possivel_time.copy()
-                    lista_jogadores.remove(jogador)
+                    lista_jogadores.remove(jog)
 
-            if len(time) == TAMANHO_TIME:
+            if len(time) == tamanho_time:
                 times.append(time)
                 break
     return times
@@ -47,26 +47,26 @@ def gera_times(TAMANHO_TIME, NUM_TIMES, jogadores):
 
 def calcula_valor_final_time(time):
     soma = 0
-    for jogador in time:
-        soma += jogador.tier
+    for jog in time:
+        soma += jog.tier
     return soma
 
 
-def calcula_score_time(time, IDEAL):
+def calcula_score_time(time, ideal):
     soma = calcula_valor_final_time(time)
-    dif = (IDEAL - soma) ** 2
+    dif = (ideal - soma) ** 2
     return dif
 
 
-def calcula_score_solucao(times, IDEAL):
+def calcula_score_solucao(times, ideal):
     score = 0
     for time in times:
-        score += calcula_score_time(time, IDEAL)
+        score += calcula_score_time(time, ideal)
     return score
 
 
-def printa_times(times, IDEAL):
-    print(f"IDEAL: {IDEAL}")
+def printa_times(times, ideal):
+    print(f"IDEAL: {ideal}")
     print('-' * 30)
     for i in range(NUM_TIMES):
         print(f"TIME {i + 1} : {calcula_valor_final_time(times[i])}")
@@ -75,29 +75,30 @@ def printa_times(times, IDEAL):
         print('-' * 30)
 
 
-def checa_parametros(TAMANHO_TIME, NUM_TIMES, jogadores):
+def checa_parametros(tamanho_time, num_times, jogadores_cadastrados):
     convidados = []
-    for jogador in jogadores:
-        for convidado in jogador.convidados:
+    for jog in jogadores_cadastrados:
+        for convidado in jog.convidados:
             convidados.append(convidado)
 
-    if len(convidados) + len(jogadores) != TAMANHO_TIME*NUM_TIMES:
+    if len(convidados) + len(jogadores_cadastrados) != tamanho_time * num_times:
         raise Exception("Número de jogadores cadastrados incompatível com o selecionado! Revisar cenário.")
 
 
-def sorteia_times(TAMANHO_TIME, NUM_TIMES, jogadores):
-    IDEAL = calcula_nota_de_corte(jogadores)
+def sorteia_times(tamanho_time, num_times, jogadores_cadastrados):
+    solucao = []
+    ideal = calcula_nota_de_corte(jogadores_cadastrados)
     score = melhor_score = 100000
     i = 0
     while i < 1000 and score != 0:
-        times_sorteados = gera_times(TAMANHO_TIME, NUM_TIMES, jogadores)
-        score = calcula_score_solucao(times_sorteados, IDEAL)
+        times_sorteados = gera_times(tamanho_time, num_times, jogadores_cadastrados)
+        score = calcula_score_solucao(times_sorteados, ideal)
         if score < melhor_score:
             melhor_score = score
             solucao = times_sorteados.copy()
 
         i += 1
-    printa_times(solucao, IDEAL)
+    printa_times(solucao, ideal)
 
 
 if __name__ == '__main__':

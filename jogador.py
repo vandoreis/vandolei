@@ -1,5 +1,7 @@
-class Jogador():
-    def __init__(self, nome, tier, convidados=[]):
+class Jogador:
+    def __init__(self, nome, tier, convidados=None):
+        if convidados is None:
+            convidados = []
         self.nome = nome
         self.tier = tier
         self.convidados = convidados
